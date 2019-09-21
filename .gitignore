@@ -1,3 +1,7 @@
 target/
 tmp/
+
 .idea/
+*.iml
+*.ipr
+*.iws

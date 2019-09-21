@@ -5,6 +5,7 @@ Demonstration of Kafka Connect Couchbase.
 ## Prerequisites
 
 * Docker
+* bash
 * curl 
 
 ## Set up Couchbase Server
@@ -14,20 +15,23 @@ Demonstration of Kafka Connect Couchbase.
        ./setup-couchbase.sh
 
 2. Visit http://localhost:8091/ and configure the cluster with username `Administrator` and password `password`.
-Optional: allocate 1024 MB to the Data service and disable all other services.
+Optional: Configure disk, memory & services; reduce the Data service memory quota to 512 MB and disable all other services.
 
 3. In the Couchbase web UI, go to the "Buckets" section and follow the link to add sample buckets. Add the `travel-sample` bucket.
 
 4. Return to the "Buckets" section and add two more buckets, `dest` and `dest-routes`.
-Reduce the memory quota to 100 MB. Enable "Flush" in the "Advanced Settings" section.
+Reduce the bucket memory quota to 100 MB. Enable "Flush" in the "Advanced Settings" section.
 
 ## Set up Kafka
 
-1. Start the Kafka containers:
+1. Start the Confluent Kafka containers:
 
        ./setup-kafka.sh
 
-It takes a while for the containers to really finish starting up. In the mean time...
+It takes a long time for the containers to actually finish starting up.
+Eventually you will be able to visit http://localhost:9021/ to see the Confluent Control Center.
+
+While you're waiting for Kafka start, move on to the next step.
 
 ## Set up connect-cli tool
 
@@ -39,6 +43,30 @@ It takes a while for the containers to really finish starting up. In the mean ti
 
        export PATH=$(pwd)/tmp/kafka-connect-tools/bin:${PATH}
 
+3. Try listing installed connectors:
+
+       connect-cli ps
+
+If the "connect" Kafka container has finished starting up, the tool should report "No running connectors".
+
+## Start a Source connector
+
+Kafka connectors are created and controlled by POSTing JSON to an HTTP server.
+The `connect-cli` tool handles that for us, and also handles converting property files to JSON. 
+ 
+    connect-cli run cb-source < config/source-1-default-schema.properties
+
+To watch the connector service log file:
+
+    docker logs -f connect
+
+If all goes well, the connector will populate the `connect-demo` topic with documents from the `travel-sample` bucket.
+
+## Start a Sink connector
+
+Let's write those documents back to Couchbase in the `dest` bucket.
+
+    connect-cli run cb-sink < config/sink-1-dest.properties    
 
 ## Clean up
 

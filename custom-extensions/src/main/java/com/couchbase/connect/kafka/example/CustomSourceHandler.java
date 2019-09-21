@@ -47,8 +47,8 @@ public class CustomSourceHandler extends RawJsonSourceHandler {
   @Override
   protected String getTopic(SourceHandlerParams params) {
     // Alter the topic based on document key / content:
-    if (params.documentEvent().key().startsWith("xyzzy")) {
-      return params.topic() + "-xyzzy";
+    if (params.documentEvent().key().startsWith("route_")) {
+      return params.topic() + "-routes";
     }
 
     // Or use the default topic
