@@ -7,6 +7,7 @@ Demonstration of Kafka Connect Couchbase.
 * Docker
 * bash
 * curl 
+* Java JDK 1.8 or later
 
 ## Set up Couchbase Server
 
@@ -67,6 +68,22 @@ If all goes well, the connector will populate the `connect-demo` topic with docu
 Let's write those documents back to Couchbase in the `dest` bucket.
 
     connect-cli run cb-sink < config/sink-1-dest.properties    
+
+## Experiment with other configurations
+
+The config directory has a few other source and sink configurations to play with.
+To re-stream the Couchbase documents, first delete the source connector:
+
+    connect-cli rm cb-source
+
+Then recreate it using the desired config.
+
+## Modifying the custom source handler
+
+After modifying the source code for `CustomSourceHandler` (located under the `custom-extensions` directory) you'll need to restart the Kafka containers in order for the new version to be active:
+
+    docker-compose -f docker/docker-compose.yml down -v
+    ./setup-kafka.sh
 
 ## Clean up
 
